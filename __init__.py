@@ -16,3 +16,11 @@ from .module_analyzer import ModuleAnalyzer
 from .split_suggester import SplitSuggester
 from .visualizer import Visualizer
 
+__all__ = [
+    'CycleDetector',
+    'DeadCodeDetector',
+    'ModuleAnalyzer',
+    'SplitSuggester',
+    'Visualizer',
+]
+
