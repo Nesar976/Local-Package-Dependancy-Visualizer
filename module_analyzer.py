@@ -56,4 +56,21 @@ class ModuleAnalyzer:
                 line_count, len(dependencies), len(dependents)
             ),
         }
+    
+    def _calculate_complexity(self, lines: int, deps: int, dependents: int) -> float:
+        """
+        Calculate a complexity score for a module.
+        
+        Args:
+            lines: Number of lines
+            deps: Number of dependencies
+            dependents: Number of dependents
+            
+        Returns:
+            Complexity score
+        """
+        # Simple heuristic: combine size and coupling
+        size_factor = min(lines / 1000, 1.0)  # Normalize to 0-1
+        coupling_factor = min((deps + dependents) / 20, 1.0)  # Normalize to 0-1
+        return (size_factor * 0.6 + coupling_factor * 0.4) * 100
 
