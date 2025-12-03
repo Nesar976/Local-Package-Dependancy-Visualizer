@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from parser import ASTParser, ImportResolver, GraphBuilder, DynamicImportDetector
-from analyser import CycleDetector, DeadCodeDetector, ModuleAnalyzer, SplitSuggester, Visualizer
+from analyzer import CycleDetector, DeadCodeDetector, ModuleAnalyzer, SplitSuggester, Visualizer
 
 
 def main():
