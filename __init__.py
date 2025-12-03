@@ -9,3 +9,6 @@ This module handles:
 - ASCII visualization
 - Graphviz export
 """
+
+from .cycle_detector import CycleDetector
+
