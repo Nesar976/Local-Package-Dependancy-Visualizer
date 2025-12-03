@@ -50,4 +50,65 @@ class SplitSuggester:
                 self.suggestions[file_path] = suggestions
         
         return self.suggestions.copy()
+    
+    def _analyze_for_splits(self, file_path: str, tree: ast.Module, min_functions: int) -> List[Dict]:
+        """Analyze a module and suggest how to split it."""
+        suggestions = []
+        
+        # Group top-level definitions by type
+        classes = []
+        functions = []
+        constants = []
+        
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef):
+                classes.append(node)
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                functions.append(node)
+            elif isinstance(node, ast.Assign):
+                constants.append(node)
+        
+        # Heuristic 1: Split by class groups (if many classes)
+        if len(classes) >= 3:
+            # Group classes by name similarity or relatedness
+            class_groups = self._group_classes(classes)
+            if len(class_groups) > 1:
+                suggestions.append({
+                    'type': 'class_grouping',
+                    'reason': f'Module has {len(classes)} classes that could be grouped',
+                    'groups': len(class_groups),
+                    'recommendation': 'Split into separate modules by class groups',
+                })
+        
+        # Heuristic 2: Split by function groups (if many functions)
+        if len(functions) >= min_functions:
+            # Check if functions can be grouped by name prefix or purpose
+            function_groups = self._group_functions(functions)
+            if len(function_groups) > 1:
+                suggestions.append({
+                    'type': 'function_grouping',
+                    'reason': f'Module has {len(functions)} functions that could be grouped',
+                    'groups': len(function_groups),
+                    'recommendation': 'Split into separate modules by function groups',
+                })
+        
+        # Heuristic 3: Split by import usage
+        import_groups = self._group_by_imports(file_path, tree)
+        if len(import_groups) > 1:
+            suggestions.append({
+                'type': 'import_grouping',
+                'reason': 'Functions/classes use different import sets',
+                'groups': len(import_groups),
+                'recommendation': 'Split modules based on import dependencies',
+            })
+        
+        # Heuristic 4: Split large single-purpose modules
+        if len(classes) == 0 and len(functions) >= 15:
+            suggestions.append({
+                'type': 'utility_split',
+                'reason': f'Large utility module with {len(functions)} functions',
+                'recommendation': 'Consider splitting into domain-specific utility modules',
+            })
+        
+        return suggestions
 
