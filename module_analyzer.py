@@ -73,4 +73,41 @@ class ModuleAnalyzer:
         size_factor = min(lines / 1000, 1.0)  # Normalize to 0-1
         coupling_factor = min((deps + dependents) / 20, 1.0)  # Normalize to 0-1
         return (size_factor * 0.6 + coupling_factor * 0.4) * 100
+    
+    def get_oversized_modules(self, threshold: int = 500) -> List[Tuple[str, int]]:
+        """
+        Get modules that exceed the line count threshold.
+        
+        Args:
+            threshold: Line count threshold (default: 500)
+            
+        Returns:
+            List of (file_path, line_count) tuples, sorted by line count
+        """
+        oversized = []
+        
+        for file_path, metrics in self.metrics.items():
+            if metrics['line_count'] > threshold:
+                oversized.append((file_path, metrics['line_count']))
+        
+        return sorted(oversized, key=lambda x: x[1], reverse=True)
+    
+    def get_highly_coupled_modules(self, threshold: int = 10) -> List[Tuple[str, int]]:
+        """
+        Get modules with high coupling (many dependencies or dependents).
+        
+        Args:
+            threshold: Total coupling threshold (deps + dependents)
+            
+        Returns:
+            List of (file_path, coupling_count) tuples, sorted by coupling
+        """
+        highly_coupled = []
+        
+        for file_path, metrics in self.metrics.items():
+            total_coupling = metrics['dependency_count'] + metrics['dependent_count']
+            if total_coupling > threshold:
+                highly_coupled.append((file_path, total_coupling))
+        
+        return sorted(highly_coupled, key=lambda x: x[1], reverse=True)
 
