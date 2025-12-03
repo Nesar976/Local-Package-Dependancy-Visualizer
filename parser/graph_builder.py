@@ -59,4 +59,28 @@ class GraphBuilder:
         self.edges.append((from_normalized, to_normalized, edge_metadata))
         self.incoming[to_normalized].add(from_normalized)       #record who imports the file 
         self.outgoing[from_normalized].add(to_normalized)       #store in list
+    def _normalize_path(self, file_path: str) -> str:
+        """Normalize a file path to a consistent format."""
+        try:
+            return str(Path(file_path).resolve())
+        except (OSError, ValueError):
+            return str(file_path)       # is something error happens return orignal string 
+    
+    def get_dependencies(self, file_path: str) -> Set[str]:             #what all the file needs 
+        """Get all files that the given file depends on."""
+        normalized = self._normalize_path(file_path)
+        return self.outgoing.get(normalized, set())
+    
+    def get_dependents(self, file_path: str) -> Set[str]:       
+        """Get all files that depend on the given file."""
+        normalized = self._normalize_path(file_path)
+        return self.incoming.get(normalized, set())
+    
+    def get_all_nodes(self) -> Set[str]:
+        """Get all nodes in the graph."""
+        return self.nodes.copy()
+    
+    def get_all_edges(self) -> List[Tuple[str, str, Dict]]:
+        """Get all edges in the graph."""
+        return self.edges.copy()
     
