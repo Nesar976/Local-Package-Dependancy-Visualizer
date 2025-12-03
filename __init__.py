@@ -1,0 +1,11 @@
+"""
+Analyzer Module - Part 2 of the Local Package Dependency Visualizer
+
+This module handles:
+- Cycle detection in dependency graphs
+- Dead code detection
+- Oversized module detection
+- Module split suggestions
+- ASCII visualization
+- Graphviz export
+"""
