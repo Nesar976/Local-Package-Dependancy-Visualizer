@@ -11,4 +11,5 @@ This module handles:
 """
 
 from .cycle_detector import CycleDetector
+from .dead_code_detector import DeadCodeDetector
 
